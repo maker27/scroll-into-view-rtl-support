@@ -78,7 +78,7 @@ function smoothScroll(
 
   // define scroll context
   scrollable = el;
-  startX = el.scrollLeft;
+  startX = getScrollLeft(el as HTMLElement);
   startY = el.scrollTop;
   method = (x: number, y: number) => {
     // use ceil to include the fractional part of the number for the scrolling
