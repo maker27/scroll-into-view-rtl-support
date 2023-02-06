@@ -4,8 +4,7 @@ type ContentDirection = 'rtl' | 'ltr';
 
 let contentDirection: ContentDirection | null = null;
 
-const isRTL = () =>
-  window.getComputedStyle(document.body, null).getPropertyValue('direction') === 'rtl';
+const isRTL = () => window.getComputedStyle(document.body, null).getPropertyValue('direction') === 'rtl';
 
 const getContentDirection = (): ContentDirection => (isRTL() ? 'rtl' : 'ltr');
 
@@ -97,10 +96,9 @@ export interface ScrollAction {
   left: number;
 }
 
-let isElement = (el: any): el is Element =>
-  typeof el === 'object' && el != null && el.nodeType === 1;
+const isElement = (el: any): el is Element => typeof el === 'object' && el != null && el.nodeType === 1;
 
-let canOverflow = (overflow: string | null, skipOverflowHiddenElements?: boolean) => {
+const canOverflow = (overflow: string | null, skipOverflowHiddenElements?: boolean) => {
   if (skipOverflowHiddenElements && overflow === 'hidden') {
     return false;
   }
@@ -108,7 +106,7 @@ let canOverflow = (overflow: string | null, skipOverflowHiddenElements?: boolean
   return overflow !== 'visible' && overflow !== 'clip';
 };
 
-let getFrameElement = (el: Element) => {
+const getFrameElement = (el: Element) => {
   if (!el.ownerDocument || !el.ownerDocument.defaultView) {
     return null;
   }
@@ -120,8 +118,8 @@ let getFrameElement = (el: Element) => {
   }
 };
 
-let isHiddenByFrame = (el: Element): boolean => {
-  let frame = getFrameElement(el);
+const isHiddenByFrame = (el: Element): boolean => {
+  const frame = getFrameElement(el);
   if (!frame) {
     return false;
   }
@@ -129,9 +127,9 @@ let isHiddenByFrame = (el: Element): boolean => {
   return frame.clientHeight < el.scrollHeight || frame.clientWidth < el.scrollWidth;
 };
 
-let isScrollable = (el: Element, skipOverflowHiddenElements?: boolean) => {
+const isScrollable = (el: Element, skipOverflowHiddenElements?: boolean) => {
   if (el.clientHeight < el.scrollHeight || el.clientWidth < el.scrollWidth) {
-    let style = getComputedStyle(el, null);
+    const style = getComputedStyle(el, null);
     return (
       canOverflow(style.overflowY, skipOverflowHiddenElements) ||
       canOverflow(style.overflowX, skipOverflowHiddenElements) ||
@@ -150,7 +148,7 @@ let isScrollable = (el: Element, skipOverflowHiddenElements?: boolean) => {
  * │ target │   frame
  * └────────┘ ┗ ━ ━ ━ ┛
  */
-let alignNearest = (
+const alignNearest = (
   scrollingEdgeStart: number,
   scrollingEdgeEnd: number,
   scrollingSize: number,
@@ -158,7 +156,7 @@ let alignNearest = (
   scrollingBorderEnd: number,
   elementEdgeStart: number,
   elementEdgeEnd: number,
-  elementSize: number
+  elementSize: number,
 ) => {
   /**
    * If element edge A and element edge B are both outside scrolling box edge A and scrolling box edge B
@@ -282,8 +280,8 @@ let alignNearest = (
   return 0;
 };
 
-let getParentElement = (element: Node): Element | null => {
-  let parent = element.parentElement;
+const getParentElement = (element: Node): Element | null => {
+  const parent = element.parentElement;
   if (parent == null) {
     return (element.getRootNode() as ShadowRoot).host || null;
   }
@@ -297,21 +295,21 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
     return [];
   }
 
-  let { scrollMode, block, inline, boundary, skipOverflowHiddenElements } = options;
+  const { scrollMode, block, inline, boundary, skipOverflowHiddenElements } = options;
   // Allow using a callback to check the boundary
   // The default behavior is to check if the current target matches the boundary element or not
   // If undefined it'll check that target is never undefined (can happen as we recurse up the tree)
-  let checkBoundary = typeof boundary === 'function' ? boundary : (node: any) => node !== boundary;
+  const checkBoundary = typeof boundary === 'function' ? boundary : (node: any) => node !== boundary;
 
   if (!isElement(target)) {
     throw new TypeError('Invalid target');
   }
 
   // Used to handle the top most element that can be scrolled
-  let scrollingElement = document.scrollingElement || document.documentElement;
+  const scrollingElement = document.scrollingElement || document.documentElement;
 
   // Collect all the scrolling boxes, as defined in the spec: https://drafts.csswg.org/cssom-view/#scrolling-box
-  let frames: Element[] = [];
+  const frames: Element[] = [];
   let cursor: Element | null = target;
   while (isElement(cursor) && checkBoundary(cursor)) {
     // Move cursor to parent
@@ -324,12 +322,7 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
     }
 
     // Skip document.body if it's not the scrollingElement and documentElement isn't independently scrollable
-    if (
-      cursor != null &&
-      cursor === document.body &&
-      isScrollable(cursor) &&
-      !isScrollable(document.documentElement)
-    ) {
+    if (cursor != null && cursor === document.body && isScrollable(cursor) && !isScrollable(document.documentElement)) {
       continue;
     }
 
@@ -344,14 +337,14 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
   // and viewport dimensions on window.innerWidth/Height
   // https://www.quirksmode.org/mobile/viewports2.html
   // https://bokand.github.io/viewport/index.html
-  let viewportWidth = window.visualViewport?.width ?? window.innerWidth;
-  let viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
 
   // Newer browsers supports scroll[X|Y], page[X|Y]Offset is
-  let viewportX = window.scrollX ?? window.pageXOffset;
-  let viewportY = window.scrollY ?? window.pageYOffset;
+  const viewportX = window.scrollX ?? window.pageXOffset;
+  const viewportY = window.scrollY ?? window.pageYOffset;
 
-  let {
+  const {
     height: targetHeight,
     width: targetWidth,
     top: targetTop,
@@ -368,19 +361,16 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
       ? targetBottom
       : targetTop + targetHeight / 2; // block === 'center
   let targetInline: number =
-    inline === 'center'
-      ? targetLeft + targetWidth / 2
-      : inline === 'end'
-      ? targetRight
-      : targetLeft; // inline === 'start || inline === 'nearest
+    inline === 'center' ? targetLeft + targetWidth / 2 : inline === 'end' ? targetRight : targetLeft; // inline === 'start || inline === 'nearest
 
   // Collect new scroll positions
-  let computations: ScrollAction[] = [];
+  const computations: ScrollAction[] = [];
   // In chrome there's no longer a difference between caching the `frames.length` to a var or not, so we don't in this case (size > speed anyways)
+  // tslint:disable-next-line:prefer-for-of
   for (let index = 0; index < frames.length; index++) {
-    let frame = frames[index];
+    const frame = frames[index];
 
-    let { height, width, top, right, bottom, left } = frame.getBoundingClientRect();
+    const { height, width, top, right, bottom, left } = frame.getBoundingClientRect();
 
     // If the element is already visible we can end it here
     if (
@@ -398,38 +388,32 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
       return computations;
     }
 
-    let frameStyle = getComputedStyle(frame);
-    let borderLeft = parseInt(frameStyle.borderLeftWidth as string, 10);
-    let borderTop = parseInt(frameStyle.borderTopWidth as string, 10);
-    let borderRight = parseInt(frameStyle.borderRightWidth as string, 10);
-    let borderBottom = parseInt(frameStyle.borderBottomWidth as string, 10);
+    const frameStyle = getComputedStyle(frame);
+    const borderLeft = parseInt(frameStyle.borderLeftWidth as string, 10);
+    const borderTop = parseInt(frameStyle.borderTopWidth as string, 10);
+    const borderRight = parseInt(frameStyle.borderRightWidth as string, 10);
+    const borderBottom = parseInt(frameStyle.borderBottomWidth as string, 10);
 
     let blockScroll: number = 0;
     let inlineScroll: number = 0;
 
     // The property existance checks for offfset[Width|Height] is because only HTMLElement objects have them, but any Element might pass by here
-    let scrollbarWidth =
+    const scrollbarWidth =
       'offsetWidth' in frame
-        ? (frame as HTMLElement).offsetWidth -
-          (frame as HTMLElement).clientWidth -
-          borderLeft -
-          borderRight
+        ? (frame as HTMLElement).offsetWidth - (frame as HTMLElement).clientWidth - borderLeft - borderRight
         : 0;
-    let scrollbarHeight =
+    const scrollbarHeight =
       'offsetHeight' in frame
-        ? (frame as HTMLElement).offsetHeight -
-          (frame as HTMLElement).clientHeight -
-          borderTop -
-          borderBottom
+        ? (frame as HTMLElement).offsetHeight - (frame as HTMLElement).clientHeight - borderTop - borderBottom
         : 0;
 
-    let scaleX =
+    const scaleX =
       'offsetWidth' in frame
         ? (frame as HTMLElement).offsetWidth === 0
           ? 0
           : width / (frame as HTMLElement).offsetWidth
         : 0;
-    let scaleY =
+    const scaleY =
       'offsetHeight' in frame
         ? (frame as HTMLElement).offsetHeight === 0
           ? 0
@@ -452,7 +436,7 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
           borderBottom,
           viewportY + targetBlock,
           viewportY + targetBlock + targetHeight,
-          targetHeight
+          targetHeight,
         );
       } else {
         // block === 'center' is the default
@@ -475,7 +459,7 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
           borderRight,
           viewportX + targetInline,
           viewportX + targetInline + targetWidth,
-          targetWidth
+          targetWidth,
         );
       }
 
@@ -498,7 +482,7 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
           borderBottom + scrollbarHeight,
           targetBlock,
           targetBlock + targetHeight,
-          targetHeight
+          targetHeight,
         );
       } else {
         // block === 'center' is the default
@@ -521,7 +505,7 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
           borderRight + scrollbarWidth,
           targetInline,
           targetInline + targetWidth,
-          targetWidth
+          targetWidth,
         );
       }
 
@@ -531,17 +515,11 @@ const computeScrollIntoView = (target: Element, options: Options): ScrollAction[
       // Ensure scroll coordinates are not out of bounds while applying scroll offsets
       blockScroll = Math.max(
         0,
-        Math.min(
-          scrollTop + blockScroll / scaleY,
-          frame.scrollHeight - height / scaleY + scrollbarHeight
-        )
+        Math.min(scrollTop + blockScroll / scaleY, frame.scrollHeight - height / scaleY + scrollbarHeight),
       );
       inlineScroll = Math.max(
         0,
-        Math.min(
-          scrollLeft + inlineScroll / scaleX,
-          frame.scrollWidth - width / scaleX + scrollbarWidth
-        )
+        Math.min(scrollLeft + inlineScroll / scaleX, frame.scrollWidth - width / scaleX + scrollbarWidth),
       );
 
       // Cache the offset so that parent frames can scroll this into view correctly

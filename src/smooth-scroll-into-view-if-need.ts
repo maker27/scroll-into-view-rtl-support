@@ -1,13 +1,7 @@
 import { getScrollLeft, setScrollLeft } from './compute-scroll-into-view';
-import scrollIntoView, {
-  CustomBehaviorOptions,
-  Options,
-  StandardBehaviorOptions,
-} from './scroll-into-view-if-needed';
+import scrollIntoView, { CustomBehaviorOptions, Options, StandardBehaviorOptions } from './scroll-into-view-if-needed';
 
-export interface CustomEasing {
-  (t: number): number;
-}
+export type CustomEasing = (t: number) => number;
 
 export type SmoothBehaviorOptions = Options & {
   behavior?: 'smooth';
@@ -33,7 +27,7 @@ type SmoothScrollAction = {
 
 type Context = {
   scrollable: Element;
-  method: Function;
+  method: (x: number, y: number) => void;
   startTime: number;
   startX: number;
   startY: number;
@@ -41,7 +35,7 @@ type Context = {
   y: number;
   duration: number;
   ease: CustomEasing;
-  cb: Function;
+  cb: () => void;
 };
 function step(context: Context) {
   const time = now();
@@ -69,7 +63,7 @@ function smoothScroll(
   y: number,
   duration = 600,
   ease: CustomEasing = (t) => 1 + --t * t * t * t * t,
-  cb: Function
+  cb: () => void,
 ) {
   let scrollable;
   let startX;
@@ -80,21 +74,21 @@ function smoothScroll(
   scrollable = el;
   startX = getScrollLeft(el as HTMLElement);
   startY = el.scrollTop;
-  method = (x: number, y: number) => {
+  method = (xValue: number, yValue: number) => {
     // use ceil to include the fractional part of the number for the scrolling
-    setScrollLeft(el as HTMLElement, Math.ceil(x));
-    el.scrollTop = Math.ceil(y);
+    setScrollLeft(el as HTMLElement, Math.ceil(xValue));
+    el.scrollTop = Math.ceil(yValue);
   };
 
   // scroll looping over a frame if needed
   step({
-    scrollable: scrollable,
-    method: method,
+    scrollable,
+    method,
     startTime: now(),
-    startX: startX,
-    startY: startY,
-    x: x,
-    y: y,
+    startX,
+    startY,
+    x,
+    y,
     duration,
     ease,
     cb,
@@ -137,11 +131,11 @@ function scroll<T>(target: Element, options?: any) {
                     el,
                     left: [startLeft, el.scrollWidth - left],
                     top: [startTop, top],
-                  })
+                  }),
                 );
               }),
             ];
-          }, [])
+          }, []),
         ),
     });
   }
