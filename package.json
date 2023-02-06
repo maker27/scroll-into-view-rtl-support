@@ -2,10 +2,20 @@
   "name": "scroll-into-view-rtl-support",
   "version": "1.0.0",
   "description": "ScrollIntoView with duration speed support",
-  "main": "src/index.ts",
+  "main": "dist/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags",
+    "prepublish": "npm run build"
   },
+  "files": ["dist/**/*"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/maker27/scroll-into-view-rtl-support.git"
@@ -15,7 +25,7 @@
     "rtl",
     "duration"
   ],
-  "author": "",
+  "author": "https://github.com/maker27/scroll-into-view-rtl-support",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/maker27/scroll-into-view-rtl-support/issues"
@@ -23,5 +33,11 @@
   "homepage": "https://github.com/maker27/scroll-into-view-rtl-support#readme",
   "dependencies": {
     "normalize-scroll-left": "^0.2.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.3",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.9.5"
   }
 }
