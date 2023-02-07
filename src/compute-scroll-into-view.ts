@@ -19,7 +19,9 @@ export const setScrollLeft = (element: HTMLElement, value: number) => {
   setNormalizedScrollLeft(element, value, contentDirection || getContentDirection());
 };
 
-window.addEventListener('load', setContentDirection);
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', setContentDirection);
+}
 
 // Compute what scrolling needs to be done on required scrolling boxes for target to be in view
 
