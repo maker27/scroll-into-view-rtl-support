@@ -1,7 +1,7 @@
 {
   "name": "scroll-into-view-rtl-support",
   "version": "1.0.2",
-  "description": "ScrollIntoView with duration speed support",
+  "description": "ScrollIntoView with custom duration support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
